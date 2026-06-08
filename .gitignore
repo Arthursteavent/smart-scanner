@@ -1,0 +1,15 @@
+# PyInstaller
+build/
+dist/
+*.spec
+
+# Python
+__pycache__/
+*.pyc
+
+# Database
+undo_history.db
+
+# OS Files
+.DS_Store
+Thumbs.db
