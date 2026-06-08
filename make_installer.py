@@ -10,33 +10,36 @@ def run_cmd(cmd):
 def main():
     print("=== Smart Scanner Installer Builder ===")
     
-    # Determine the correct python command (python for Windows, python3 for Mac/Linux)
-    python_cmd = "python" if platform.system() == "Windows" else "python3"
+    base_python = sys.executable
 
-    # 1. Install Requirements
-    print("\n[1/3] Installing requirements...")
-    run_cmd(f"{python_cmd} -m pip install -r requirements.txt")
+    # 1. Create Virtual Environment to avoid PEP 668 (externally-managed-environment) errors
+    print("\n[1/4] Creating Virtual Environment...")
+    venv_dir = "build_env"
+    if not os.path.exists(venv_dir):
+        run_cmd(f'"{base_python}" -m venv {venv_dir}')
     
-    # 2. Check & Install PyInstaller
-    print("\n[2/3] Checking PyInstaller...")
-    try:
-        import PyInstaller
-    except ImportError:
-        print("PyInstaller not found. Installing...")
-        run_cmd(f"{python_cmd} -m pip install pyinstaller")
+    # Get the python executable from inside the virtual environment
+    if platform.system() == "Windows":
+        python_cmd = os.path.join(venv_dir, "Scripts", "python.exe")
+    else:
+        python_cmd = os.path.join(venv_dir, "bin", "python")
 
-    # 3. Build the Application
-    print("\n[3/3] Building the application executable...")
+    # 2. Install Requirements
+    print("\n[2/4] Installing requirements...")
+    run_cmd(f'"{python_cmd}" -m pip install -r requirements.txt')
     
-    # Windows uses ';' to separate paths, Mac/Linux uses ':'
+    # 3. Check & Install PyInstaller
+    print("\n[3/4] Checking & Installing PyInstaller...")
+    run_cmd(f'"{python_cmd}" -m pip install pyinstaller')
+
+    # 4. Build the Application
+    print("\n[4/4] Building the application executable...")
     separator = ";" if platform.system() == "Windows" else ":"
     
-    # We use --onefile on Windows for a single .exe, 
-    # but on Mac we use --onedir to properly generate the .app folder format
     if platform.system() == "Windows":
-        cmd = f'{python_cmd} -m PyInstaller --noconfirm --onefile --windowed --name "SmartScanner" --add-data "config.json{separator}." --add-data "core/keywords.json{separator}core" main.py'
+        cmd = f'"{python_cmd}" -m PyInstaller --noconfirm --onefile --windowed --name "SmartScanner" --add-data "config.json{separator}." --add-data "core/keywords.json{separator}core" main.py'
     else:
-        cmd = f'{python_cmd} -m PyInstaller --noconfirm --onedir --windowed --name "SmartScanner" --add-data "config.json{separator}." --add-data "core/keywords.json{separator}core" main.py'
+        cmd = f'"{python_cmd}" -m PyInstaller --noconfirm --onedir --windowed --name "SmartScanner" --add-data "config.json{separator}." --add-data "core/keywords.json{separator}core" main.py'
 
     run_cmd(cmd)
 
