@@ -1,0 +1,7 @@
+{
+    "target_folder": "C:/Users/junta/OneDrive/Desktop",
+    "provider": "Local",
+    "openai_key": "",
+    "gemini_key": "",
+    "gemini_model": "gemini-2.5-flash"
+}
