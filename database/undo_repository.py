@@ -32,12 +32,13 @@ def get_operations_by_batch(batch_id: str):
     conn.close()
     return rows
 
-def undo_batch(batch_id: str):
+def undo_batch(batch_id: str, log_callback=None, progress_callback=None):
     operations = get_operations_by_batch(batch_id)
     success_count = 0
     failed_count = 0
+    total = len(operations)
 
-    for op_id, source_path, destination_path in operations:
+    for i, (op_id, source_path, destination_path) in enumerate(operations):
         src = Path(source_path)
         dst = Path(destination_path)
 
@@ -47,6 +48,11 @@ def undo_batch(batch_id: str):
             try:
                 # Ensure the original parent directory exists just in case
                 src.parent.mkdir(parents=True, exist_ok=True)
+                if log_callback:
+                    if dst.is_dir():
+                        log_callback(f"|WHITE|< undo project folder \"{dst.name}\" back to \"{src.parent}\"")
+                    else:
+                        log_callback(f"< undo \"{dst.name}\" back to \"{src.parent}\"")
                 shutil.move(str(dst), str(src))
                 success_count += 1
                 
@@ -54,14 +60,25 @@ def undo_batch(batch_id: str):
                 if dst.parent.exists() and not any(dst.parent.iterdir()):
                     try:
                         dst.parent.rmdir()
+                        if log_callback:
+                            log_callback(f"< removed empty folder \"{dst.parent}\"")
                     except OSError:
                         pass
             except Exception as e:
-                print(f"Failed to move {dst} back to {src}: {e}")
+                if log_callback:
+                    log_callback(f"! Failed to move {dst} back to {src}: {e}")
+                else:
+                    print(f"Failed to move {dst} back to {src}: {e}")
                 failed_count += 1
         else:
-            print(f"File not found at {dst}, cannot undo.")
+            if log_callback:
+                log_callback(f"! File not found at {dst}, cannot undo.")
+            else:
+                print(f"File not found at {dst}, cannot undo.")
             failed_count += 1
+            
+        if progress_callback and total > 0:
+            progress_callback((i + 1) / total)
             
     # Remove the batch from history after undoing
     conn = get_connection()

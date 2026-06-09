@@ -81,6 +81,16 @@ class LocalProvider(BaseAIProvider):
                 })
                 continue
                 
+            # If it's a project folder, route it directly to Work/Projects
+            if file.get("is_project", False):
+                response_files.append({
+                    "path": path,
+                    "category": "Work",
+                    "subcategory": "Projects",
+                    "confidence": 100
+                })
+                continue
+                
             full_path_lower = Path(path).as_posix().lower()
             ext = Path(path).suffix.lower()
             parent_dir = Path(path).parent.name.lower()

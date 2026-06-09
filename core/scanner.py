@@ -43,6 +43,28 @@ class FolderScanner:
             dirnames[:] = [d for d in dirnames if d not in self.ignore_folders]
 
             folder_count += 1
+            
+            # Check for project folders
+            project_indicators = {'artisan', 'package.json', 'pom.xml', 'build.gradle', 'manage.py', '.git', 'Cargo.toml', 'go.mod', 'composer.json'}
+            if set(filenames) & project_indicators:
+                file_path = Path(dirpath)
+                stat = file_path.stat()
+                metadata = {
+                    "filename": file_path.name,
+                    "extension": ".project",
+                    "full_path": str(file_path),
+                    "parent_folder": file_path.parent.name,
+                    "file_size": 0,
+                    "created_at": datetime.fromtimestamp(stat.st_ctime).isoformat(),
+                    "modified_at": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+                    "is_duplicate": False,
+                    "is_project": True
+                }
+                scanned_files.append(metadata)
+                count += 1
+                dirnames[:] = [] # Prevent recursing into this project folder
+                continue
+
             for filename in filenames:
                 file_path = Path(dirpath) / filename
                 

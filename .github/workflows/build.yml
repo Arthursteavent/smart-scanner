@@ -31,16 +31,19 @@ jobs:
         run: |
           pyinstaller --noconfirm --onedir --windowed --name "SmartScanner" --add-data "config.json:." --add-data "core/keywords.json:core" main.py
 
-      - name: Zip Mac App
+      - name: Create Mac DMG
         run: |
-          cd dist
-          zip -r SmartScanner-Mac.zip SmartScanner.app/
-
+          STAGE="$(mktemp -d)/dmg"
+          mkdir -p "$STAGE"
+          cp -R "dist/SmartScanner.app" "$STAGE/"
+          ln -s /Applications "$STAGE/Applications"
+          hdiutil create -volname "SmartScanner" -srcfolder "$STAGE" -ov -format UDZO "dist/SmartScanner.dmg"
+          
       - name: Upload Mac Artifact
         uses: actions/upload-artifact@v4
         with:
           name: SmartScanner-Mac
-          path: dist/SmartScanner-Mac.zip
+          path: dist/SmartScanner.dmg
 
   build-windows:
     runs-on: windows-latest

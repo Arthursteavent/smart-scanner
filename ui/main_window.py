@@ -55,7 +55,7 @@ class AppController:
                 return
 
             self.log(f"> Preparing {len(files_metadata)} files for Smart Local Analysis...")
-            status_callback("Starting Smart Local Analysis...")
+            status_callback(f"Starting Smart Local Analysis for {len(files_metadata)} files...", progress=0.0)
             
             # Always use local offline provider, bypassing all cloud AI settings
             from providers.local_provider import LocalProvider
@@ -72,7 +72,10 @@ class AppController:
                 batch_files = files_metadata[i:i + BATCH_SIZE]
                 
                 self.log(f"> Analyzing file batch {batch_num}/{total_batches} ({len(batch_files)} files)...")
-                status_callback(f"Analyzing batch {batch_num}/{total_batches}...")
+                
+                # Show informative text with progress percentage
+                current_file_count = min(i + BATCH_SIZE, len(files_metadata))
+                status_callback(f"Analyzing batch {batch_num}/{total_batches} ({current_file_count}/{len(files_metadata)} files)...", progress=(batch_num - 1) / total_batches)
                 
                 response_json = provider.classify_files(batch_files)
                 
@@ -100,7 +103,7 @@ class AppController:
                 
             self.last_tree = combined_tree
             self.log("> Smart analysis complete. Ready for preview.")
-            status_callback("Smart Organization complete. Please review the preview.")
+            status_callback("Smart Organization complete. Please review the preview.", progress=1.0)
             completion_callback(True, "Analysis complete.")
         except Exception as e:
             completion_callback(False, f"Error: {e}")
@@ -151,7 +154,7 @@ class AppController:
     def show_settings_page(self):
         self.app.show_frame(SettingsPage)
 
-    def apply_organization(self):
+    def apply_organization(self, progress_callback=None):
         if not self.last_tree:
             return False
             
@@ -176,7 +179,7 @@ class AppController:
             organizer = FileOrganizer(str(target_folder), log_callback=self.log)
             
             self.log("> Executing moves...")
-            organizer.apply_organization(self.last_tree)
+            organizer.apply_organization(self.last_tree, progress_callback=progress_callback)
             self.log("> Organization finished successfully.")
             return True
         except Exception as e:
@@ -184,11 +187,11 @@ class AppController:
             print(f"Failed to apply: {e}")
             return False
 
-    def undo_last_operation(self):
+    def undo_last_operation(self, progress_callback=None):
         batch_id = get_last_batch_id()
         if not batch_id:
             return 0, 0
-        return undo_batch(batch_id)
+        return undo_batch(batch_id, log_callback=self.log, progress_callback=progress_callback)
 
 
 class MainWindow(ctk.CTk):
@@ -198,10 +201,10 @@ class MainWindow(ctk.CTk):
         # Apply modern premium dark theme
         ctk.set_appearance_mode("dark")
 
-        self.title("Smart Folder Manager Enterprise")
-        self.geometry("1000x750")
-        # Ultra Dark Background
-        self.configure(fg_color="#09090B")
+        self.title("Smart Organizer Enterprise")
+        self.geometry("1100x800")
+        # Deep Dark Blue Background
+        self.configure(fg_color="#0F172A")
         
         # Configure grid layout
         self.grid_rowconfigure(0, weight=1)
@@ -210,25 +213,42 @@ class MainWindow(ctk.CTk):
         self.controller = AppController()
         self.controller.set_app(self)
 
-        # Create Navigation Sidebar (Premium Zinc-900)
-        self.sidebar_frame = ctk.CTkFrame(self, width=220, corner_radius=0, fg_color="#18181B")
+        # Create Navigation Sidebar (Slate-900 / Very Dark Blue)
+        self.sidebar_frame = ctk.CTkFrame(self, width=240, corner_radius=0, fg_color="#0B0F19")
         self.sidebar_frame.grid(row=0, column=0, sticky="nsew")
-        self.sidebar_frame.grid_rowconfigure(4, weight=1)
+        self.sidebar_frame.grid_rowconfigure(5, weight=1) # push storage down
 
         # Logo Area
-        self.logo_label = ctk.CTkLabel(self.sidebar_frame, text="Smart\nOrganizer", font=ctk.CTkFont(family="Inter", size=26, weight="bold"), text_color="#6366F1")
-        self.logo_label.grid(row=0, column=0, padx=20, pady=(35, 30), sticky="w")
+        self.logo_frame = ctk.CTkFrame(self.sidebar_frame, fg_color="transparent")
+        self.logo_frame.grid(row=0, column=0, padx=20, pady=(35, 30), sticky="w")
+        
+        self.logo_title = ctk.CTkLabel(self.logo_frame, text="Smart Organizer", font=ctk.CTkFont(family="Inter", size=22, weight="bold"), text_color="#F8FAFC")
+        self.logo_title.pack(anchor="w")
+        self.logo_subtitle = ctk.CTkLabel(self.logo_frame, text="ENTERPRISE EDITION", font=ctk.CTkFont(family="Inter", size=10, weight="bold"), text_color="#94A3B8")
+        self.logo_subtitle.pack(anchor="w")
 
         # Nav Buttons
         nav_font = ctk.CTkFont(family="Inter", size=14, weight="bold")
-        self.nav_scan = ctk.CTkButton(self.sidebar_frame, text="  📁 Scan Folders", font=nav_font, fg_color="transparent", text_color="#E4E4E7", hover_color="#27272A", anchor="w", command=self.controller.show_scan_page)
-        self.nav_scan.grid(row=1, column=0, padx=15, pady=10, sticky="ew")
+        self.nav_scan = ctk.CTkButton(self.sidebar_frame, text="  📁 Scan Folders", font=nav_font, fg_color="transparent", text_color="#F8FAFC", hover_color="#1E293B", anchor="w", command=self.controller.show_scan_page)
+        self.nav_scan.grid(row=1, column=0, padx=15, pady=5, sticky="ew")
 
-        self.nav_preview = ctk.CTkButton(self.sidebar_frame, text="  👁️ Preview", font=nav_font, fg_color="transparent", text_color="#E4E4E7", hover_color="#27272A", anchor="w", command=self.controller.show_preview_page)
-        self.nav_preview.grid(row=2, column=0, padx=15, pady=10, sticky="ew")
+        self.nav_preview = ctk.CTkButton(self.sidebar_frame, text="  👁️ Preview", font=nav_font, fg_color="transparent", text_color="#F8FAFC", hover_color="#1E293B", anchor="w", command=self.controller.show_preview_page)
+        self.nav_preview.grid(row=2, column=0, padx=15, pady=5, sticky="ew")
 
-        self.nav_settings = ctk.CTkButton(self.sidebar_frame, text="  ⚙️ Settings", font=nav_font, fg_color="transparent", text_color="#E4E4E7", hover_color="#27272A", anchor="w", command=self.controller.show_settings_page)
-        self.nav_settings.grid(row=3, column=0, padx=15, pady=10, sticky="ew")
+        self.nav_settings = ctk.CTkButton(self.sidebar_frame, text="  ⚙️ Settings", font=nav_font, fg_color="transparent", text_color="#F8FAFC", hover_color="#1E293B", anchor="w", command=self.controller.show_settings_page)
+        self.nav_settings.grid(row=3, column=0, padx=15, pady=5, sticky="ew")
+
+        # Storage Status
+        self.storage_frame = ctk.CTkFrame(self.sidebar_frame, fg_color="transparent")
+        self.storage_frame.grid(row=6, column=0, sticky="s", padx=20, pady=(0, 30))
+        
+        self.storage_label = ctk.CTkLabel(self.storage_frame, text="STORAGE STATUS", font=ctk.CTkFont(family="Inter", size=11, weight="bold"), text_color="#94A3B8")
+        self.storage_label.pack(anchor="w")
+        self.storage_bar = ctk.CTkProgressBar(self.storage_frame, width=180, height=6, progress_color="#06B6D4", fg_color="#1E293B")
+        self.storage_bar.pack(pady=(8, 5), anchor="w")
+        self.storage_bar.set(0.7) # Mockup
+        self.storage_text = ctk.CTkLabel(self.storage_frame, text="42.8 GB of 60 GB used", font=ctk.CTkFont(family="Inter", size=10), text_color="#94A3B8")
+        self.storage_text.pack(anchor="w")
 
         # Create main content area
         self.main_container = ctk.CTkFrame(self, corner_radius=0, fg_color="transparent")
@@ -237,14 +257,29 @@ class MainWindow(ctk.CTk):
         self.main_container.grid_columnconfigure(0, weight=1)
 
         # Bottom Console Log Area
-        self.log_container = ctk.CTkFrame(self.main_container, fg_color="#000000", corner_radius=8, border_width=1, border_color="#27272A")
+        self.log_container = ctk.CTkFrame(self.main_container, fg_color="#0B0F19", corner_radius=8, border_width=1, border_color="#1E293B")
         self.log_container.grid(row=1, column=0, sticky="nsew", padx=30, pady=(0, 20))
         self.log_container.grid_rowconfigure(1, weight=1)
         self.log_container.grid_columnconfigure(0, weight=1)
 
         # Terminal Header
-        self.log_header = ctk.CTkLabel(self.log_container, text=">_ DEVELOPER CONSOLE", font=ctk.CTkFont(family="Consolas", size=11, weight="bold"), text_color="#52525B")
-        self.log_header.grid(row=0, column=0, sticky="w", padx=15, pady=(8, 0))
+        self.log_header_frame = ctk.CTkFrame(self.log_container, fg_color="transparent", height=30)
+        self.log_header_frame.grid(row=0, column=0, sticky="ew", padx=15, pady=(8, 0))
+        
+        # Left: Title
+        self.log_header_left = ctk.CTkFrame(self.log_header_frame, fg_color="transparent")
+        self.log_header_left.pack(side="left")
+        self.log_icon = ctk.CTkLabel(self.log_header_left, text=">_ ", font=ctk.CTkFont(family="Consolas", size=12, weight="bold"), text_color="#06B6D4")
+        self.log_icon.pack(side="left")
+        self.log_header = ctk.CTkLabel(self.log_header_left, text="DEVELOPER CONSOLE", font=ctk.CTkFont(family="Inter", size=11, weight="bold"), text_color="#F8FAFC")
+        self.log_header.pack(side="left")
+        
+        # Right: Mac Dots
+        self.dots_frame = ctk.CTkFrame(self.log_header_frame, fg_color="transparent")
+        self.dots_frame.pack(side="right")
+        ctk.CTkLabel(self.dots_frame, text="●", text_color="#EF4444", font=ctk.CTkFont(size=14)).pack(side="left", padx=2)
+        ctk.CTkLabel(self.dots_frame, text="●", text_color="#F59E0B", font=ctk.CTkFont(size=14)).pack(side="left", padx=2)
+        ctk.CTkLabel(self.dots_frame, text="●", text_color="#10B981", font=ctk.CTkFont(size=14)).pack(side="left", padx=2)
 
         self.log_textbox = ctk.CTkTextbox(
             self.log_container, 
@@ -255,6 +290,9 @@ class MainWindow(ctk.CTk):
         )
         self.log_textbox.grid(row=1, column=0, sticky="nsew", padx=10, pady=(0, 10))
         self.log_textbox.configure(state="disabled")
+        
+        # Configure tags for colors
+        self.log_textbox.tag_config("white", foreground="#F8FAFC")
 
         # Initialize pages
         self.scan_page = ScanPage(self.main_container, self.controller, fg_color="transparent")
@@ -276,10 +314,18 @@ class MainWindow(ctk.CTk):
             
         frame = self.pages[page_class]
         frame.grid(row=0, column=0, sticky="nsew")
+        
+        # Update Nav Active State
+        self.nav_scan.configure(fg_color="#1E293B" if page_class == ScanPage else "transparent")
+        self.nav_preview.configure(fg_color="#1E293B" if page_class == PreviewPage else "transparent")
+        self.nav_settings.configure(fg_color="#1E293B" if page_class == SettingsPage else "transparent")
 
     def append_log(self, message):
         self.log_textbox.configure(state="normal")
-        self.log_textbox.insert("end", message + "\n")
+        if message.startswith("|WHITE|"):
+            self.log_textbox.insert("end", message.replace("|WHITE|", "") + "\n", "white")
+        else:
+            self.log_textbox.insert("end", message + "\n")
         self.log_textbox.yview("end")
         self.log_textbox.configure(state="disabled")
         self.update()
