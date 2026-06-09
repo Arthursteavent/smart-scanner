@@ -1,5 +1,6 @@
 import shutil
 from pathlib import Path
+from typing import Optional
 from database.database import get_connection
 
 def log_operation(source_path: str, destination_path: str, batch_id: str):
@@ -12,7 +13,7 @@ def log_operation(source_path: str, destination_path: str, batch_id: str):
     conn.commit()
     conn.close()
 
-def get_last_batch_id() -> str | None:
+def get_last_batch_id() -> Optional[str]:
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT batch_id FROM operations ORDER BY timestamp DESC LIMIT 1")

@@ -11,7 +11,12 @@ class LocalProvider(BaseAIProvider):
         
     def _load_keywords(self) -> Dict[str, List[str]]:
         try:
-            keywords_path = Path("core/keywords.json")
+            import sys
+            if getattr(sys, 'frozen', False):
+                keywords_path = Path(sys._MEIPASS) / "core" / "keywords.json"
+            else:
+                keywords_path = Path("core/keywords.json")
+                
             if keywords_path.exists():
                 with open(keywords_path, 'r', encoding='utf-8') as f:
                     return json.load(f)
@@ -27,6 +32,7 @@ class LocalProvider(BaseAIProvider):
             'Digital Assets': ['design', 'mockup', 'psd', 'movie', 'video', 'music', 'setup', 'software', 'app'],
             'Archives': ['backup', 'archive', 'arsip', 'bundle']
         }
+
         
     def get_subcategory(self, ext: str) -> str:
         if ext in ['.pdf', '.doc', '.docx', '.txt', '.rtf']:

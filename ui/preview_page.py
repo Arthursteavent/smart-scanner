@@ -19,9 +19,25 @@ class PreviewPage(ctk.CTkFrame):
         self.info_label = ctk.CTkLabel(self.card_frame, text="Review the proposed folder structure. Click 'Apply Changes' when ready.", text_color="#A1A1AA", font=ctk.CTkFont(family="Inter", size=14))
         self.info_label.pack(pady=(0, 20), padx=40, anchor="w")
 
-        # Tabview for separation
+        # Buttons Frame (Packed first at the bottom so it is never pushed off-screen)
+        self.button_frame = ctk.CTkFrame(self.card_frame, fg_color="transparent")
+        self.button_frame.pack(side="bottom", fill="x", padx=40, pady=(15, 30))
+        
+        self.apply_button = ctk.CTkButton(self.button_frame, text="✅ Apply Changes", font=ctk.CTkFont(family="Inter", weight="bold"), fg_color="#10B981", hover_color="#059669", text_color="#FAFAFA", height=45, corner_radius=8, command=self.apply_changes)
+        self.apply_button.pack(side="left")
+        
+        self.delete_dupes_button = ctk.CTkButton(self.button_frame, text="🗑️ Delete Duplicates", font=ctk.CTkFont(family="Inter", weight="bold"), fg_color="#EF4444", hover_color="#DC2626", text_color="#FAFAFA", height=45, corner_radius=8, command=self.delete_duplicates)
+        self.delete_dupes_button.pack(side="left", padx=15)
+        
+        self.undo_button = ctk.CTkButton(self.button_frame, text="↩️ Undo Last", font=ctk.CTkFont(family="Inter", weight="bold"), fg_color="#F59E0B", hover_color="#D97706", text_color="#FAFAFA", height=45, corner_radius=8, command=self.undo_changes)
+        self.undo_button.pack(side="left")
+        
+        self.back_button = ctk.CTkButton(self.button_frame, text="Back to Scan", font=ctk.CTkFont(family="Inter", weight="bold"), fg_color="#27272A", hover_color="#3F3F46", text_color="#FAFAFA", height=45, corner_radius=8, command=self.app_controller.show_scan_page)
+        self.back_button.pack(side="right")
+
+        # Tabview for separation (Expands to fill the remaining middle space)
         self.tabview = ctk.CTkTabview(self.card_frame, fg_color="#09090B", segmented_button_fg_color="#27272A", segmented_button_selected_color="#6366F1", segmented_button_selected_hover_color="#4F46E5", corner_radius=8)
-        self.tabview.pack(fill="both", expand=True, padx=40, pady=10)
+        self.tabview.pack(side="top", fill="both", expand=True, padx=40, pady=(10, 0))
         
         self.tab_main = self.tabview.add("📁 Organized Files")
         self.tab_dupes = self.tabview.add("🗑️ Duplicate Files")
@@ -51,22 +67,6 @@ class PreviewPage(ctk.CTkFrame):
         self.dupes_scrollbar = ttk.Scrollbar(self.tab_dupes, orient="vertical", command=self.dupes_tree.yview)
         self.dupes_scrollbar.pack(side="right", fill="y")
         self.dupes_tree.configure(yscrollcommand=self.dupes_scrollbar.set)
-
-        # Buttons Frame
-        self.button_frame = ctk.CTkFrame(self.card_frame, fg_color="transparent")
-        self.button_frame.pack(fill="x", padx=40, pady=(15, 40))
-        
-        self.apply_button = ctk.CTkButton(self.button_frame, text="✅ Apply Changes", font=ctk.CTkFont(family="Inter", weight="bold"), fg_color="#10B981", hover_color="#059669", text_color="#FAFAFA", height=45, corner_radius=8, command=self.apply_changes)
-        self.apply_button.pack(side="left")
-        
-        self.delete_dupes_button = ctk.CTkButton(self.button_frame, text="🗑️ Delete Duplicates", font=ctk.CTkFont(family="Inter", weight="bold"), fg_color="#EF4444", hover_color="#DC2626", text_color="#FAFAFA", height=45, corner_radius=8, command=self.delete_duplicates)
-        self.delete_dupes_button.pack(side="left", padx=15)
-        
-        self.undo_button = ctk.CTkButton(self.button_frame, text="↩️ Undo Last", font=ctk.CTkFont(family="Inter", weight="bold"), fg_color="#F59E0B", hover_color="#D97706", text_color="#FAFAFA", height=45, corner_radius=8, command=self.undo_changes)
-        self.undo_button.pack(side="left")
-        
-        self.back_button = ctk.CTkButton(self.button_frame, text="Back to Scan", font=ctk.CTkFont(family="Inter", weight="bold"), fg_color="#27272A", hover_color="#3F3F46", text_color="#FAFAFA", height=45, corner_radius=8, command=self.app_controller.show_scan_page)
-        self.back_button.pack(side="right")
 
     def _populate_specific_tree(self, tree, data_subset):
         for item in tree.get_children():

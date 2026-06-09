@@ -56,26 +56,10 @@ class AppController:
 
             self.log(f"> Preparing {len(files_metadata)} files for Smart Local Analysis...")
             status_callback("Starting Smart Local Analysis...")
-            provider_name = self.settings.get("provider", "Local")
             
-            # Initialize provider based on settings
-            if provider_name == "Ollama":
-                from providers.ollama_provider import OllamaProvider
-                provider = OllamaProvider()
-            elif provider_name == "OpenAI":
-                from providers.openai_provider import OpenAIProvider
-                provider = OpenAIProvider(api_key=self.settings.get("openai_key"))
-            elif provider_name == "Gemini":
-                from providers.gemini_provider import GeminiProvider
-                provider = GeminiProvider(
-                    api_key=self.settings.get("gemini_key"),
-                    model_name=self.settings.get("gemini_model", "gemini-2.5-flash")
-                )
-            elif provider_name == "Local":
-                from providers.local_provider import LocalProvider
-                provider = LocalProvider()
-            else:
-                raise ValueError("Unknown provider")
+            # Always use local offline provider, bypassing all cloud AI settings
+            from providers.local_provider import LocalProvider
+            provider = LocalProvider()
 
             # Batching to prevent huge JSON syntax errors
             BATCH_SIZE = 300

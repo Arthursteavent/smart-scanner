@@ -1,12 +1,14 @@
 import sqlite3
 import os
+import sys
 from pathlib import Path
+from core.config_manager import get_data_dir
 
-DB_FILE = "undo_history.db"
+DB_FILE = get_data_dir() / "undo_history.db"
 
 def get_connection():
-    # Ensure database is in the current working directory
     return sqlite3.connect(DB_FILE)
+
 
 def init_db():
     conn = get_connection()
