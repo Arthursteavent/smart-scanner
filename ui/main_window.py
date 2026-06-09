@@ -238,17 +238,7 @@ class MainWindow(ctk.CTk):
         self.nav_settings = ctk.CTkButton(self.sidebar_frame, text="  ⚙️ Settings", font=nav_font, fg_color="transparent", text_color="#F8FAFC", hover_color="#1E293B", anchor="w", command=self.controller.show_settings_page)
         self.nav_settings.grid(row=3, column=0, padx=15, pady=5, sticky="ew")
 
-        # Storage Status
-        self.storage_frame = ctk.CTkFrame(self.sidebar_frame, fg_color="transparent")
-        self.storage_frame.grid(row=6, column=0, sticky="s", padx=20, pady=(0, 30))
-        
-        self.storage_label = ctk.CTkLabel(self.storage_frame, text="STORAGE STATUS", font=ctk.CTkFont(family="Inter", size=11, weight="bold"), text_color="#94A3B8")
-        self.storage_label.pack(anchor="w")
-        self.storage_bar = ctk.CTkProgressBar(self.storage_frame, width=180, height=6, progress_color="#06B6D4", fg_color="#1E293B")
-        self.storage_bar.pack(pady=(8, 5), anchor="w")
-        self.storage_bar.set(0.7) # Mockup
-        self.storage_text = ctk.CTkLabel(self.storage_frame, text="42.8 GB of 60 GB used", font=ctk.CTkFont(family="Inter", size=10), text_color="#94A3B8")
-        self.storage_text.pack(anchor="w")
+
 
         # Create main content area
         self.main_container = ctk.CTkFrame(self, corner_radius=0, fg_color="transparent")
