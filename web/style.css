@@ -1,0 +1,108 @@
+body {
+    background-color: #13131b;
+    color: #e4e1ed;
+    font-family: 'Inter', sans-serif;
+}
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #1b1b23;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #494455;
+    border-radius: 10px;
+}
+
+.glass-panel {
+    background: rgba(31, 31, 39, 0.6);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(148, 142, 161, 0.15);
+}
+
+.gradient-primary {
+    background: linear-gradient(135deg, #cdbdff 0%, #7c4dff 100%);
+}
+
+.gradient-secondary {
+    background: linear-gradient(135deg, #ffb688 0%, #ffdbc7 100%);
+}
+
+/* Page transitions */
+.page-view {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.page-view.active {
+    opacity: 1;
+    pointer-events: auto;
+    position: relative;
+    height: auto;
+    overflow-y: visible;
+}
+
+/* Hide elements utility */
+.hidden {
+    display: none !important;
+}
+
+/* Tree view styling */
+.tree-node {
+    margin-left: 24px;
+    margin-top: 8px;
+    border-left: 1px dashed rgba(148, 142, 161, 0.3);
+    padding-left: 12px;
+}
+
+.tree-category {
+    font-weight: 600;
+    color: #cdbdff; /* primary */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    margin-bottom: 8px;
+    padding: 4px 8px;
+    border-radius: 2px;
+    transition: background 0.2s;
+}
+
+.tree-category:hover {
+    background: rgba(205, 189, 255, 0.1);
+}
+
+.tree-file {
+    font-size: 13px;
+    color: #e4e1ed; /* on-surface */
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 2px;
+    transition: background 0.2s;
+}
+
+.tree-file:hover {
+    background: rgba(148, 142, 161, 0.1);
+}
+
+.tree-icon {
+    font-size: 18px !important;
+}

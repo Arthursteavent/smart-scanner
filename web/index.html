@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html class="dark" lang="id">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Smart Organizer Enterprise</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#13131b",
+                        "surface-container-low": "#1b1b23",
+                        "outline-variant": "#494455",
+                        "surface-container-high": "#292932",
+                        "surface-container-highest": "#34343d",
+                        "surface-container-lowest": "#0d0d15",
+                        "primary": "#cdbdff",
+                        "primary-fixed-dim": "#cdbdff",
+                        "tertiary": "#ffb688",
+                        "error": "#ffb4ab",
+                        "success": "#10B981"
+                    },
+                    "borderRadius": {
+                        "sm": "0.125rem",
+                        "DEFAULT": "0.25rem",
+                        "md": "0.375rem"
+                    }
+                },
+            },
+        }
+    </script>
+<link rel="stylesheet" href="style.css">
+<script type="text/javascript" src="/eel.js"></script>
+<style>
+    /* Add slight structured feel with backgrounds */
+    .glass-panel {
+        background: rgba(27, 27, 35, 0.8);
+        border: 1px solid rgba(73, 68, 85, 0.6);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .panel-inset {
+        background: rgba(13, 13, 21, 0.5);
+        border: 1px inset rgba(73, 68, 85, 0.4);
+    }
+</style>
+</head>
+<body class="overflow-hidden bg-surface-dim flex text-[#e4e1ed] text-sm">
+
+<!-- Navigation Shell: SideNavBar -->
+<aside class="fixed h-full w-[220px] left-0 top-0 border-r border-outline-variant bg-surface-container-low flex flex-col z-50">
+    <div class="px-4 py-6 border-b border-outline-variant/40">
+        <h1 class="text-lg font-bold text-primary leading-tight font-['Geist']">Smart Organizer</h1>
+        <p class="text-[10px] uppercase tracking-wider text-[#cac3d8] opacity-70 mt-1 font-['JetBrains_Mono']">Enterprise Edition</p>
+    </div>
+    <nav class="flex-1 space-y-0.5 px-2 py-4">
+        <!-- Active State -->
+        <a id="nav-scan" class="nav-item flex items-center gap-3 px-3 py-2 text-primary font-bold bg-primary/10 border-l-[3px] border-primary cursor-pointer text-xs uppercase tracking-wide" data-target="scan-page">
+            <span class="material-symbols-outlined text-[18px]" data-icon="folder_open">folder_open</span>
+            <span>Scan Folders</span>
+        </a>
+        <a id="nav-preview" class="nav-item flex items-center gap-3 px-3 py-2 text-[#cac3d8] hover:text-white hover:bg-surface-container-high border-l-[3px] border-transparent transition-colors cursor-pointer text-xs uppercase tracking-wide" data-target="preview-page">
+            <span class="material-symbols-outlined text-[18px]" data-icon="visibility">visibility</span>
+            <span>Preview</span>
+        </a>
+        <a id="nav-settings" class="nav-item flex items-center gap-3 px-3 py-2 text-[#cac3d8] hover:text-white hover:bg-surface-container-high border-l-[3px] border-transparent transition-colors cursor-pointer text-xs uppercase tracking-wide" data-target="settings-page">
+            <span class="material-symbols-outlined text-[18px]" data-icon="settings">settings</span>
+            <span>Settings</span>
+        </a>
+    </nav>
+    
+    <!-- Quick Guide -->
+    <div class="p-4 border-t border-outline-variant/40 bg-surface-container-highest/20">
+        <h4 class="text-[10px] font-bold text-primary uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[14px]">lightbulb</span>
+            Panduan Singkat
+        </h4>
+        <ol class="text-[10px] text-[#cac3d8] space-y-2 list-decimal list-inside opacity-80 leading-relaxed font-['Inter']">
+            <li>Buka <b class="text-white">Settings</b>, atur folder tujuan utama.</li>
+            <li>Di <b class="text-white">Scan Folders</b>, tambah folder & mulai pindai.</li>
+            <li>Tinjau struktur di <b class="text-white">Preview</b> lalu Terapkan.</li>
+        </ol>
+    </div>
+</aside>
+
+<!-- Navigation Shell: TopAppBar -->
+<header class="fixed top-0 right-0 w-[calc(100%-220px)] z-40 flex justify-between items-center h-12 px-6 bg-surface-container-low/90 backdrop-blur-md border-b border-outline-variant shadow-sm ml-[220px]">
+    <div class="flex items-center gap-4">
+        <span class="text-xs font-['JetBrains_Mono'] font-medium text-[#cac3d8]" id="top-bar-title">Langkah 1: Konfigurasi Sumber</span>
+    </div>
+    <div class="flex items-center gap-4">
+        <button class="text-[#cac3d8] hover:text-primary transition-colors">
+            <span class="material-symbols-outlined text-[18px]" data-icon="notifications">notifications</span>
+        </button>
+    </div>
+</header>
+
+<!-- Main Content Canvas -->
+<main class="ml-[220px] pt-12 h-screen w-[calc(100%-220px)] flex flex-col relative bg-[#13131b]">
+    
+    <!-- PAGE CONTAINER -->
+    <div class="flex-1 overflow-y-auto p-6 custom-scrollbar relative" id="page-container">
+        
+        <!-- ==================== SCAN PAGE ==================== -->
+        <div id="scan-page" class="page-view max-w-6xl mx-auto space-y-6 opacity-100 transition-opacity duration-300">
+            <!-- Page Header -->
+            <div class="space-y-1 border-b border-outline-variant/30 pb-4">
+                <h2 class="text-2xl font-['Geist'] font-semibold text-white">Pindai Folder</h2>
+                <p class="text-sm text-[#cac3d8] max-w-3xl">
+                    Konfigurasikan direktori sumber untuk mengindeks file secara cerdas dengan algoritma klasifikasi otomatis.
+                </p>
+            </div>
+            
+            <!-- Scan Overview Stats Dashboard -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="glass-panel p-4 rounded-sm flex flex-col gap-2">
+                    <div class="flex items-center gap-2 text-primary border-b border-outline-variant/30 pb-2">
+                        <span class="material-symbols-outlined text-lg">folder_managed</span>
+                        <span class="text-[11px] font-bold uppercase tracking-wider">Total Folder</span>
+                    </div>
+                    <div class="text-2xl font-['Geist'] font-bold text-white mt-1" id="stat-folder-count">0</div>
+                    <p class="text-[11px] text-[#cac3d8]">Folder aktif yang dipantau</p>
+                </div>
+                <div class="glass-panel p-4 rounded-sm flex flex-col gap-2">
+                    <div class="flex items-center gap-2 text-primary-fixed-dim border-b border-outline-variant/30 pb-2">
+                        <span class="material-symbols-outlined text-lg">description</span>
+                        <span class="text-[11px] font-bold uppercase tracking-wider">Potensi File</span>
+                    </div>
+                    <div class="text-2xl font-['Geist'] font-bold text-white mt-1" id="stat-file-count">~</div>
+                    <p class="text-[11px] text-[#cac3d8]">Estimasi item terdeteksi</p>
+                </div>
+                <div class="glass-panel p-4 rounded-sm flex flex-col gap-2">
+                    <div class="flex items-center gap-2 text-tertiary border-b border-outline-variant/30 pb-2">
+                        <span class="material-symbols-outlined text-lg">timer</span>
+                        <span class="text-[11px] font-bold uppercase tracking-wider">Estimasi Waktu</span>
+                    </div>
+                    <div class="text-2xl font-['Geist'] font-bold text-white mt-1" id="stat-time">--</div>
+                    <p class="text-[11px] text-[#cac3d8]">Waktu pemrosesan indeks</p>
+                </div>
+            </div>
+
+            <!-- Folder Management Section -->
+            <div class="space-y-4">
+                <div class="flex justify-between items-end border-b border-outline-variant/30 pb-2">
+                    <div class="flex items-center gap-3">
+                        <h3 class="text-lg font-['Geist'] font-medium text-white">Manajemen Path</h3>
+                        <span class="px-2 py-0.5 bg-surface-container-high border border-outline-variant/50 text-[10px] text-[#cac3d8] rounded-sm" id="badge-active-count">0 Aktif</span>
+                    </div>
+                    <button id="btn-add-folder" class="flex items-center gap-2 bg-surface-container-high border border-outline-variant hover:bg-outline-variant text-white px-3 py-1.5 rounded-sm font-medium transition-colors text-xs">
+                        <span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                        Tambah Folder
+                    </button>
+                </div>
+
+                <!-- Structured List -->
+                <div class="space-y-3">
+                    <div class="glass-panel rounded-sm overflow-hidden">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-surface-container-low text-[10px] text-[#cac3d8] uppercase tracking-wider border-b border-outline-variant/60">
+                                    <th class="px-4 py-2 font-medium border-r border-outline-variant/30 w-1/2">Nama Path</th>
+                                    <th class="px-4 py-2 font-medium border-r border-outline-variant/30">Status</th>
+                                    <th class="px-4 py-2 font-medium text-center w-24">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="folder-list-body" class="divide-y divide-outline-variant/40">
+                                <tr id="empty-folder-row">
+                                    <td colspan="3" class="px-4 py-8 text-center text-[#cac3d8] italic panel-inset">
+                                        Belum ada folder yang ditambahkan.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                </div>
+            </div>
+            </div>
+
+            <!-- Progress Card -->
+            <div id="scan-progress-section" class="glass-panel p-4 rounded-sm space-y-3 border-l-[3px] border-l-primary">
+                <div class="flex justify-between items-center">
+                    <div class="space-y-0.5">
+                        <p class="text-sm font-bold text-white" id="scan-status-title">Siap Memindai...</p>
+                        <p class="text-xs text-[#cac3d8]">Sistem siap memetakan struktur file.</p>
+                    </div>
+                    <span class="text-xl font-['Geist'] font-bold text-primary-fixed-dim" id="scan-pct">0%</span>
+                </div>
+                <!-- Progress Bar -->
+                <div class="w-full bg-surface-container-highest h-1.5 rounded-none border border-outline-variant/30">
+                    <div id="scan-progress-fill" class="bg-primary h-full transition-all duration-300" style="width: 0%;"></div>
+                </div>
+                <div class="pt-2 border-t border-outline-variant/30 mt-3">
+                    <button id="btn-start-scan" disabled class="w-full bg-primary hover:bg-white text-[#13131b] font-bold text-sm py-2 rounded-sm flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span class="material-symbols-outlined text-sm">rocket_launch</span>
+                        Mulai Pindai Cerdas
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PREVIEW PAGE ==================== -->
+        <div id="preview-page" class="page-view max-w-6xl mx-auto space-y-6 absolute top-0 left-0 w-full p-6 opacity-0 pointer-events-none transition-opacity duration-300 hidden">
+            <div class="flex justify-between items-end border-b border-outline-variant/30 pb-4">
+                <div class="space-y-1">
+                    <h2 class="text-2xl font-['Geist'] font-semibold text-white">Preview Organisasi</h2>
+                    <p class="text-sm text-[#cac3d8] max-w-3xl">Tinjau bagaimana file Anda akan diatur sebelum dieksekusi.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button id="btn-delete-duplicates" style="display: none;" class="flex items-center gap-2 bg-error/10 border border-error/50 text-error px-3 py-1.5 rounded-sm font-medium hover:bg-error hover:text-white transition-colors text-xs">
+                        <span class="material-symbols-outlined text-sm">delete</span> Hapus Duplikat
+                    </button>
+                    <button id="btn-undo" class="flex items-center gap-2 bg-surface-container-high border border-outline-variant text-white px-3 py-1.5 rounded-sm font-medium hover:bg-outline-variant transition-colors text-xs">
+                        <span class="material-symbols-outlined text-sm">undo</span> Undo Terakhir
+                    </button>
+                    <button id="btn-apply-org" disabled class="flex items-center gap-2 bg-success text-[#13131b] px-3 py-1.5 rounded-sm font-bold hover:brightness-110 transition-colors text-xs disabled:opacity-50">
+                        <span class="material-symbols-outlined text-sm">check_circle</span> Terapkan Perubahan
+                    </button>
+                </div>
+            </div>
+
+            <!-- Org Progress -->
+            <div id="org-progress-section" class="glass-panel p-3 rounded-sm space-y-2 border-l-[3px] border-l-success hidden">
+                <div class="flex justify-between items-center">
+                    <p class="text-xs font-bold text-success uppercase tracking-wider">Menerapkan Perubahan...</p>
+                    <span class="text-xs font-bold text-success" id="org-pct">0%</span>
+                </div>
+                <div class="w-full bg-surface-container-highest h-1 rounded-none border border-outline-variant/30">
+                    <div id="org-progress-fill" class="bg-success h-full transition-all duration-300" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <!-- Tree View Container -->
+            <div class="glass-panel p-4 rounded-sm h-[450px] overflow-y-auto custom-scrollbar panel-inset" id="tree-view">
+                <div class="flex flex-col items-center justify-center h-full opacity-50 text-[#cac3d8]">
+                    <span class="material-symbols-outlined text-4xl mb-2">account_tree</span>
+                    <p class="text-sm">Lakukan pemindaian terlebih dahulu untuk melihat hierarki folder.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SETTINGS PAGE ==================== -->
+        <div id="settings-page" class="page-view max-w-6xl mx-auto space-y-6 absolute top-0 left-0 w-full p-6 opacity-0 pointer-events-none transition-opacity duration-300 hidden">
+            <div class="space-y-1 border-b border-outline-variant/30 pb-4">
+                <h2 class="text-2xl font-['Geist'] font-semibold text-white">Pengaturan Sistem</h2>
+                <p class="text-sm text-[#cac3d8] max-w-3xl">Sesuaikan konfigurasi penyimpanan aplikasi Anda.</p>
+            </div>
+
+            <div class="glass-panel p-6 rounded-sm space-y-6 max-w-2xl">
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-primary uppercase tracking-wider">Managed Folder Destination</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="target-folder-input" readonly class="flex-1 bg-surface-container-lowest border border-outline-variant rounded-sm px-3 py-1.5 text-white text-sm focus:border-primary outline-none panel-inset" placeholder="Pilih folder tujuan...">
+                        <button id="btn-browse-target" class="bg-surface-container-high border border-outline-variant hover:bg-outline-variant text-white px-4 py-1.5 rounded-sm font-medium transition-colors text-xs">Browse</button>
+                    </div>
+                    <p class="text-[11px] text-[#cac3d8] opacity-70">Semua file akan dipindahkan dan dikelompokkan ke dalam folder ini.</p>
+                </div>
+
+                <div class="pt-4 border-t border-outline-variant/30 flex justify-between items-center mt-4">
+                    <p id="settings-msg" class="text-success text-xs font-bold"></p>
+                    <button id="btn-save-settings" class="bg-primary hover:bg-white text-[#13131b] px-6 py-2 rounded-sm font-bold transition-colors text-xs">
+                        Simpan Pengaturan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Developer Console Terminal -->
+    <footer class="h-40 bg-surface-container-lowest border-t border-outline-variant/80 p-3 flex flex-col font-['JetBrains_Mono'] z-40 shrink-0">
+        <div class="flex items-center gap-3 mb-2 border-b border-outline-variant/40 pb-2">
+            <span class="material-symbols-outlined text-primary text-sm">terminal</span>
+            <span class="text-[10px] font-bold text-[#cac3d8] uppercase tracking-widest">System Console</span>
+            <div class="ml-auto flex gap-1.5">
+                <div class="w-2 h-2 rounded-none bg-error/60 border border-error"></div>
+                <div class="w-2 h-2 rounded-none bg-tertiary/60 border border-tertiary"></div>
+                <div class="w-2 h-2 rounded-none bg-primary/60 border border-primary"></div>
+            </div>
+        </div>
+        <div class="flex-1 overflow-y-auto custom-scrollbar space-y-1 text-[11px]" id="console-output">
+            <p class="text-primary opacity-90"><span class="text-[#cac3d8]/40 mr-2">[SYS]</span> Initializing Smart Organizer Core Engine...</p>
+        </div>
+    </footer>
+</main>
+
+<!-- Success Modal -->
+<div id="success-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
+    <div class="glass-panel p-8 rounded-md max-w-sm w-full text-center space-y-4 transform scale-95 transition-all duration-300" id="success-modal-content">
+        <div class="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto border border-success/30">
+            <span class="material-symbols-outlined text-success text-4xl">task_alt</span>
+        </div>
+        <h3 class="text-2xl font-['Geist'] font-bold text-white">Selesai! 🎉</h3>
+        <p class="text-sm text-[#cac3d8]" id="success-modal-message">File Anda sudah tertata rapi.</p>
+        
+        <div class="grid grid-cols-2 gap-3 my-4">
+            <div class="bg-surface-container-low p-3 rounded-sm border border-outline-variant/30 flex flex-col items-center">
+                <p class="text-[10px] text-[#cac3d8] uppercase tracking-wider mb-1">Total File</p>
+                <p class="text-xl font-['Geist'] font-bold text-primary" id="modal-stat-total">0</p>
+            </div>
+            <div class="bg-surface-container-low p-3 rounded-sm border border-outline-variant/30 flex flex-col items-center">
+                <p class="text-[10px] text-[#cac3d8] uppercase tracking-wider mb-1">Kategori</p>
+                <p class="text-xl font-['Geist'] font-bold text-tertiary" id="modal-stat-categories">0</p>
+            </div>
+        </div>
+
+        <div class="pt-4 mt-2 border-t border-outline-variant/30">
+            <button id="btn-close-modal" class="bg-success text-[#13131b] hover:brightness-110 font-bold px-6 py-2 rounded-sm w-full transition-colors text-sm">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

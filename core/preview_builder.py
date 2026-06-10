@@ -33,15 +33,18 @@ class PreviewBuilder:
                 if cat not in tree:
                     tree[cat] = {"_files": []}
                     
+                import os
                 if subcat:
                     if subcat not in tree[cat]:
                         tree[cat][subcat] = []
                     tree[cat][subcat].append({
+                        "name": os.path.basename(file_item.path),
                         "path": file_item.path,
                         "confidence": file_item.confidence
                     })
                 else:
                     tree[cat]["_files"].append({
+                        "name": os.path.basename(file_item.path),
                         "path": file_item.path,
                         "confidence": file_item.confidence
                     })
