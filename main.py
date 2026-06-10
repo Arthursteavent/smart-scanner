@@ -1,3 +1,4 @@
+import sys
 import eel
 import os
 import threading
