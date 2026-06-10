@@ -14,7 +14,7 @@ if %errorlevel% neq 0 (
 
 :: Run PyInstaller
 echo Running PyInstaller...
-python -m PyInstaller --noconfirm --onefile --windowed --name "SmartScanner" --add-data "config.json;." --add-data "core/keywords.json;core" main.py
+python -m PyInstaller --noconfirm --onefile --windowed --name "SmartScanner" --add-data "config.json;." --add-data "core/keywords.json;core" --add-data "web;web" main.py
 
 echo.
 echo Build complete! The executable is located in the "dist\SmartScanner" folder.

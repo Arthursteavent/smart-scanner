@@ -32,7 +32,7 @@ echo "[3/4] Installing PyInstaller..."
 # 4. Build the Application
 echo "[4/4] Building the application executable..."
 rm -rf build dist
-"$PYTHON_CMD" -m PyInstaller --noconfirm --onedir --windowed --name "SmartScanner" --add-data "config.json:." --add-data "core/keywords.json:core" main.py
+"$PYTHON_CMD" -m PyInstaller --noconfirm --onedir --windowed --name "SmartScanner" --add-data "config.json:." --add-data "core/keywords.json:core" --add-data "web:web" main.py
 
 # 5. Packaging into .dmg
 echo "Packaging dist/SmartScanner.dmg..."
