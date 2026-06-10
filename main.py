@@ -17,6 +17,16 @@ root = tk.Tk()
 root.withdraw()
 root.attributes('-topmost', True)
 
+# Center the hidden root window so dialogs open in the center of the screen
+try:
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    x = int(screen_width / 2)
+    y = int(screen_height / 2)
+    root.geometry(f"0x0+{x}+{y}")
+except Exception:
+    pass
+
 last_tree = None
 
 def send_log(message):
