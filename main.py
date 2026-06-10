@@ -21,9 +21,11 @@ root.attributes('-topmost', True)
 try:
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
-    x = int(screen_width / 2)
-    y = int(screen_height / 2)
-    root.geometry(f"0x0+{x}+{y}")
+    w = 400
+    h = 300
+    x = int((screen_width / 2) - (w / 2))
+    y = int((screen_height / 2) - (h / 2))
+    root.geometry(f"{w}x{h}+{x}+{y}")
 except Exception:
     pass
 
@@ -34,7 +36,20 @@ def send_log(message):
 
 @eel.expose
 def select_folder():
+    try:
+        root.attributes('-alpha', 0.0)  # Make it transparent
+        root.deiconify()                # Show it temporarily
+        root.update_idletasks()         # Apply geometry changes
+    except Exception:
+        pass
+
     folder_path = filedialog.askdirectory(parent=root, title="Select Folder to Organize")
+    
+    try:
+        root.withdraw()                 # Hide it again
+    except Exception:
+        pass
+        
     return folder_path
 
 @eel.expose
