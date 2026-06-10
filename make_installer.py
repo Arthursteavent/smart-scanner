@@ -37,9 +37,9 @@ def main():
     separator = ";" if platform.system() == "Windows" else ":"
     
     if platform.system() == "Windows":
-        cmd = f'"{python_cmd}" -m PyInstaller --noconfirm --onefile --windowed --name "SmartScanner" --add-data "config.json{separator}." --add-data "core/keywords.json{separator}core" main.py'
+        cmd = f'"{python_cmd}" -m PyInstaller --noconfirm --onefile --windowed --name "SmartScanner" --add-data "config.json{separator}." --add-data "core/keywords.json{separator}core" --add-data "web{separator}web" main.py'
     else:
-        cmd = f'"{python_cmd}" -m PyInstaller --noconfirm --onedir --windowed --name "SmartScanner" --add-data "config.json{separator}." --add-data "core/keywords.json{separator}core" main.py'
+        cmd = f'"{python_cmd}" -m PyInstaller --noconfirm --onedir --windowed --name "SmartScanner" --add-data "config.json{separator}." --add-data "core/keywords.json{separator}core" --add-data "web{separator}web" main.py'
 
     run_cmd(cmd)
 

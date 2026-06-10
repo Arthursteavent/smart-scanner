@@ -185,9 +185,14 @@ def undo_last_operation():
     restored, failed = undo_batch(batch_id, log_callback=send_log)
     return {"restored": restored, "failed": failed}
 
+def get_web_dir():
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, 'web')
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'web')
+
 def main():
     init_db()
-    eel.init('web')
+    eel.init(get_web_dir())
     
     # Start app
     try:
